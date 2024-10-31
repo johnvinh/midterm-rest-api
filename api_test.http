@@ -1,0 +1,42 @@
+### Get all students
+GET http://localhost:8000/students
+Content-Type: application/json
+
+
+###
+
+### Create a new student
+POST http://localhost:8000/students
+Content-Type: application/json
+
+{
+  "id": 1,
+  "name": "John Doe",
+  "grade": "A",
+  "email": "john.doe@example.com"
+}
+
+###
+
+### Get a student by ID
+GET http://localhost:8000/students/1
+Content-Type: application/json
+
+###
+
+### Update a student
+PUT http://localhost:8000/students/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "name": "John Doe Jr.",
+  "grade": "A+",
+  "email": "john.doe.jr@example.com"
+}
+
+###
+
+### Delete a student
+DELETE http://localhost:8000/students/1
+Content-Type: application/json
