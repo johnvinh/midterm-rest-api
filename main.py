@@ -3,15 +3,23 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-# Student model
-class Student(BaseModel):
-    id: int
+# Base model without id
+class StudentBase(BaseModel):
     name: str
     grade: str
     email: str
 
-# In-memory "database"
+# Model for creating a student (input model)
+class StudentCreate(StudentBase):
+    pass
+
+# Model for returning a student (output model with id)
+class Student(StudentBase):
+    id: int
+
+# In-memory "database" and auto-incrementing id counter
 students = {}
+next_id = 1
 
 # GET /students: Retrieve a list of all students
 @app.get("/students")
@@ -26,20 +34,23 @@ def get_student(student_id: int):
     else:
         raise HTTPException(status_code=404, detail="Student not found")
 
-# POST /students: Add a new student
+# POST /students: Add a new student without requiring an id
 @app.post("/students")
-def create_student(student: Student):
-    if student.id in students:
-        raise HTTPException(status_code=400, detail="Student with this ID already exists")
-    students[student.id] = student
-    return student
+def create_student(student: StudentCreate):
+    global next_id
+    student_id = next_id
+    next_id += 1
+    new_student = Student(id=student_id, **student.dict())
+    students[student_id] = new_student
+    return new_student
 
 # PUT /students/{id}: Update an existing student by ID
 @app.put("/students/{student_id}")
-def update_student(student_id: int, student: Student):
+def update_student(student_id: int, student: StudentBase):
     if student_id in students:
-        students[student_id] = student
-        return student
+        updated_student = Student(id=student_id, **student.dict())
+        students[student_id] = updated_student
+        return updated_student
     else:
         raise HTTPException(status_code=404, detail="Student not found")
 
